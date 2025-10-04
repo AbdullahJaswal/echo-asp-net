@@ -1,0 +1,7 @@
+﻿services:
+  echo:
+    image: echo
+    build:
+      context: .
+      dockerfile: Echo/Dockerfile
+
