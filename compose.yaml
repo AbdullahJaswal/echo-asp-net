@@ -1,7 +1,31 @@
-﻿services:
-  echo:
-    image: echo
+﻿version: '3.9'
+
+services:
+  api:
+    container_name: echo-api
     build:
       context: .
       dockerfile: Echo/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5160
+      - Database__ConnectionString=Server=mssql,1433;Database=EchoDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;
+    depends_on:
+      - mssql
+    ports:
+      - "5160:5160"
 
+  mssql:
+    container_name: echo-mssql
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+
+volumes:
+  mssql-data:

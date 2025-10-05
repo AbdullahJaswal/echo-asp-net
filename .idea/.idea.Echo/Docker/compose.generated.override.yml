@@ -1,0 +1,21 @@
+# This is a generated file. Not intended for manual editing.
+version: "3.9"
+services:
+  api:
+    build:
+      context: "/Users/abdullahjaswal/Projects/Echo"
+      dockerfile: "Echo/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net9.0/Echo.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "echo:dev"
+    ports: []
+    volumes:
+    - "/Users/abdullahjaswal/Projects/Echo/Echo:/app:rw"
+    - "/Users/abdullahjaswal/Projects/Echo:/src:rw"
+    - "/Users/abdullahjaswal/.nuget/packages:/home/app/.nuget/packages"
+    working_dir: "/app"
