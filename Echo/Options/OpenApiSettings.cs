@@ -1,8 +1,8 @@
 namespace Echo.Options;
 
-public class OpenApiSettings
+public sealed class OpenApiSettings
 {
-    public string Title { get; set; } = string.Empty;
-    public string Version { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
+    public string Title { get; init; } = string.Empty;
+    public string Version { get; init; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
 }

@@ -1,4 +1,4 @@
-﻿version: '3.9'
+﻿version: "3.9"
 
 services:
   api:
@@ -7,9 +7,14 @@ services:
       context: .
       dockerfile: Echo/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5160
-      - Database__ConnectionString=Server=mssql,1433;Database=EchoDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - Database__ConnectionString=${Database__ConnectionString}
+      - Jwt__Issuer=${Jwt__Issuer}
+      - Jwt__Audience=${Jwt__Audience}
+      - Jwt__Key=${Jwt__Key}
+      - Jwt__AccessTokenMinutes=${Jwt__AccessTokenMinutes}
+      - Jwt__RefreshTokenDays=${Jwt__RefreshTokenDays}
     depends_on:
       - mssql
     ports:

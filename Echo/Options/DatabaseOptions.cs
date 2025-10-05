@@ -1,6 +1,6 @@
 namespace Echo.Options;
 
-public class DatabaseOptions
+public sealed class DatabaseOptions
 {
-    public string ConnectionString { get; set; } = string.Empty;
+    public string ConnectionString { get; init; } = string.Empty;
 }
