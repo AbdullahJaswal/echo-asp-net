@@ -1,3 +1,88 @@
 @Echo_HostAddress = http://localhost:5160
+@contentType = application/json
+@username = user_{{$timestamp}}
+@password = P@ssw0rd!123
 
 ###
+# Get OpenAPI document
+GET {{Echo_HostAddress}}/openapi/v1.json
+
+###
+# Register a new user
+# Stores tokens from the response
+# @name register
+POST {{Echo_HostAddress}}/api/Auth/register
+Content-Type: {{contentType}}
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {%
+    client.global.set("reg_accessToken", response.body.accessToken);
+    client.global.set("reg_refreshToken", response.body.refreshToken);
+%}
+
+###
+# Login with existing user
+# Stores tokens from the response
+# @name login
+POST {{Echo_HostAddress}}/api/Auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {%
+    client.global.set("login_accessToken", response.body.accessToken);
+    client.global.set("login_refreshToken", response.body.refreshToken);
+%}
+
+###
+# Get current user profile using login token
+GET {{Echo_HostAddress}}/api/Users/me
+Authorization: Bearer {{login_accessToken}}
+
+###
+# Get current user profile using register token
+GET {{Echo_HostAddress}}/api/Users/me
+Authorization: Bearer {{reg_accessToken}}
+
+###
+# Refresh token (from login)
+POST {{Echo_HostAddress}}/api/Auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{login_refreshToken}}"
+}
+
+> {%
+    client.global.set("login_accessToken", response.body.accessToken);
+%}
+
+###
+# Refresh token (from register)
+POST {{Echo_HostAddress}}/api/Auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{reg_refreshToken}}"
+}
+
+> {%
+    client.global.set("reg_accessToken", response.body.accessToken);
+%}
+
+###
+# Logout using login tokens
+POST {{Echo_HostAddress}}/api/Auth/logout
+Content-Type: {{contentType}}
+Authorization: Bearer {{login_accessToken}}
+
+{
+  "refreshToken": "{{login_refreshToken}}"
+}
