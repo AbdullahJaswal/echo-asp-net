@@ -1,23 +1,25 @@
 name: Lint
 
 on:
-  pull_request:
-    branches: ["**"]
+    push:
+        branches: [ "**" ]
+    pull_request:
+        branches: [ "**" ]
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
+            -   name: Setup .NET
+                uses: actions/setup-dotnet@v4
+                with:
+                    dotnet-version: '9.0.x'
 
-      - name: Restore
-        run: dotnet restore Echo.sln
+            -   name: Restore
+                run: dotnet restore Echo.sln
 
-      - name: Verify analyzers (lint)
-        run: dotnet format analyzers Echo.sln --verify-no-changes --verbosity minimal
+            -   name: Verify analyzers (lint)
+                run: dotnet format analyzers Echo.sln --verify-no-changes --verbosity minimal

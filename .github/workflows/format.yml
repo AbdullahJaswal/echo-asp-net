@@ -1,59 +1,72 @@
 name: Format
 
 on:
-  pull_request:
-    branches: ["**"]
+    push:
+        branches: [ "**" ]
+    pull_request:
+        branches: [ "**" ]
 
 permissions:
-  contents: write
-  pull-requests: write
+    contents: write
+    pull-requests: write
 
 jobs:
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          fetch-depth: 0
+    format:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout (PR)
+                if: github.event_name == 'pull_request'
+                uses: actions/checkout@v4
+                with:
+                    ref: ${{ github.event.pull_request.head.ref }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+                    fetch-depth: 0
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
+            -   name: Checkout (push)
+                if: github.event_name != 'pull_request'
+                uses: actions/checkout@v4
 
-      - name: Restore
-        run: dotnet restore Echo.sln
+            -   name: Setup .NET
+                uses: actions/setup-dotnet@v4
+                with:
+                    dotnet-version: '9.0.x'
 
-      - name: Apply formatting
-        run: dotnet format Echo.sln --verbosity minimal
+            -   name: Restore
+                run: dotnet restore Echo.sln
 
-      - name: Detect changes
-        id: changes
-        shell: bash
-        run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          fi
+            -   name: Apply formatting (PR)
+                if: github.event_name == 'pull_request'
+                run: dotnet format Echo.sln --verbosity minimal
 
-      - name: Commit and push formatting changes
-        if: steps.changes.outputs.changed == 'true' && github.event.pull_request.head.repo.full_name == github.repository
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "ci(format): apply dotnet format"
-          git push
+            -   name: Verify formatting (push)
+                if: github.event_name != 'pull_request'
+                run: dotnet format Echo.sln --verify-no-changes --verbosity minimal
 
-      - name: Enable auto-merge (squash)
-        if: steps.changes.outputs.changed == 'true' && github.event.pull_request.head.repo.full_name == github.repository
-        uses: peter-evans/enable-pull-request-automerge@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          pull-request-number: ${{ github.event.pull_request.number }}
-          merge-method: squash
+            -   name: Detect changes
+                if: github.event_name == 'pull_request'
+                id: changes
+                shell: bash
+                run: |
+                    if [[ -n "$(git status --porcelain)" ]]; then
+                      echo "changed=true" >> "$GITHUB_OUTPUT"
+                    else
+                      echo "changed=false" >> "$GITHUB_OUTPUT"
+                    fi
+
+            -   name: Commit and push formatting changes
+                if: github.event_name == 'pull_request' && steps.changes.outputs.changed == 'true' && github.event.pull_request.head.repo.full_name == github.repository
+                shell: bash
+                run: |
+                    git config user.name "github-actions[bot]"
+                    git config user.email "github-actions[bot]@users.noreply.github.com"
+                    git add -A
+                    git commit -m "ci(format): apply dotnet format"
+                    git push
+
+            -   name: Enable auto-merge (squash)
+                if: github.event_name == 'pull_request' && steps.changes.outputs.changed == 'true' && github.event.pull_request.head.repo.full_name == github.repository
+                uses: peter-evans/enable-pull-request-automerge@v3
+                with:
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    pull-request-number: ${{ github.event.pull_request.number }}
+                    merge-method: squash
