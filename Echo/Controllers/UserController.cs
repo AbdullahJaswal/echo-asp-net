@@ -15,7 +15,7 @@ public class UsersController : ControllerBase
         return Ok(new
         {
             id = User.FindFirstValue("sub"),
-            username = User.FindFirstValue("unique_name"),
+            username = User.FindFirstValue("name")
         });
     }
 }

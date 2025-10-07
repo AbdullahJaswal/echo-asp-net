@@ -12,4 +12,6 @@ public class User
     public bool IsActive { get; set; } = true;
 
     public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+
+    public ICollection<RoomMember> RoomMemberships { get; set; } = new HashSet<RoomMember>();
 }
