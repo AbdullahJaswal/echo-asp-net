@@ -69,6 +69,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .HasMaxLength(100)
                 .IsRequired();
 
+            b.Property(r => r.PasswordHash)
+                .HasMaxLength(512)
+                .IsRequired();
+
             b.Property(r => r.CreatedUtc)
                 .HasDefaultValueSql("GETUTCDATE()");
 
