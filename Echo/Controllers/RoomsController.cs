@@ -50,17 +50,17 @@ public class RoomsController(AppDbContext db, IPasswordHasher hasher) : Controll
         if (!TryGetUserId(out var userId)) return Unauthorized();
 
         var query = from m in db.RoomMembers.AsNoTracking()
-            join r in db.Rooms.AsNoTracking() on m.RoomId equals r.Id
-            where m.UserId == userId
-            select new RoomResponse
-            {
-                Id = r.Id,
-                Name = r.Name,
-                IsActive = r.IsActive,
-                CreatedUtc = r.CreatedUtc,
-                IsMember = true,
-                IsModerator = m.IsModerator
-            };
+                    join r in db.Rooms.AsNoTracking() on m.RoomId equals r.Id
+                    where m.UserId == userId
+                    select new RoomResponse
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        IsActive = r.IsActive,
+                        CreatedUtc = r.CreatedUtc,
+                        IsMember = true,
+                        IsModerator = m.IsModerator
+                    };
 
         var list = await query.ToListAsync(cancellationToken);
         return Ok(list);
