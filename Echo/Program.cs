@@ -1,8 +1,10 @@
 using System.Text;
+
 using Echo.Data;
 using Echo.Options;
 using Echo.Services;
 using Echo.Services.Abstractions;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

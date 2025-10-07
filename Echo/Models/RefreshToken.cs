@@ -9,7 +9,7 @@ public class RefreshToken
 
     [Required] public Guid UserId { get; set; }
     [ForeignKey(nameof(UserId))] public User? User { get; set; }
-    [Required] [MaxLength(512)] public string Token { get; set; } = string.Empty;
+    [Required][MaxLength(512)] public string Token { get; set; } = string.Empty;
 
     public bool Revoked { get; set; }
 
