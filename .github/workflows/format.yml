@@ -12,6 +12,7 @@ permissions:
 
 jobs:
     format:
+        if: github.actor != 'github-actions[bot]'
         runs-on: ubuntu-latest
         steps:
             -   name: Checkout (PR)
@@ -34,16 +35,10 @@ jobs:
             -   name: Restore
                 run: dotnet restore Echo.sln
 
-            -   name: Apply formatting (PR)
-                if: github.event_name == 'pull_request'
+            -   name: Apply formatting
                 run: dotnet format Echo.sln --verbosity minimal
 
-            -   name: Verify formatting (push)
-                if: github.event_name != 'pull_request'
-                run: dotnet format Echo.sln --verify-no-changes --verbosity minimal
-
             -   name: Detect changes
-                if: github.event_name == 'pull_request'
                 id: changes
                 shell: bash
                 run: |
@@ -53,8 +48,18 @@ jobs:
                       echo "changed=false" >> "$GITHUB_OUTPUT"
                     fi
 
-            -   name: Commit and push formatting changes
+            -   name: Commit and push formatting changes (PR)
                 if: github.event_name == 'pull_request' && steps.changes.outputs.changed == 'true' && github.event.pull_request.head.repo.full_name == github.repository
+                shell: bash
+                run: |
+                    git config user.name "github-actions[bot]"
+                    git config user.email "github-actions[bot]@users.noreply.github.com"
+                    git add -A
+                    git commit -m "ci(format): apply dotnet format"
+                    git push
+
+            -   name: Commit and push formatting changes (push)
+                if: github.event_name == 'push' && steps.changes.outputs.changed == 'true'
                 shell: bash
                 run: |
                     git config user.name "github-actions[bot]"
